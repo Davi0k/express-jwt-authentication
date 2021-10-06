@@ -12,6 +12,8 @@ import {
 
 import * as jwt from "jsonwebtoken";
 
+import "./@types/express"
+
 export interface IOptions {
     secret?: jwt.Secret,
     algorithm?: jwt.Algorithm,
@@ -20,8 +22,6 @@ export interface IOptions {
     required?: {
         [key: string]: string[]
     },
-
-    validation?: (payload: jwt.JwtPayload) => boolean,
     
     retrieveJWT?: (req?: Request, res?: Response, next?: NextFunction) => string | null
 }
