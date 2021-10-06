@@ -18,15 +18,16 @@ import "./@types/express"
 export interface IOptions {
     secret?: jwt.Secret,
     algorithm?: jwt.Algorithm,
-    guest?: boolean,
+    
+    allow_guests?: boolean,
 
-    required?: {
+    required_claims?: {
         [key: string]: string[]
     },
 
     isRevoked?: (payload: jwt.JwtPayload) => boolean,
     
-    retrieveJWT?: (req?: Request, res?: Response, next?: NextFunction) => string | null
+    retrieveJwt?: (req?: Request, res?: Response, next?: NextFunction) => string | null
 }
 
 export default function(options?: IOptions): (req: Request, res: Response, next: NextFunction) => void {
@@ -43,20 +44,20 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
     return (req: Request, res: Response, next: NextFunction): void => {
         let token: string | null;
 
-        if (options.retrieveJWT) {
-            token = options.retrieveJWT(req, res, next);
+        if (options.retrieveJwt) {
+            token = options.retrieveJwt(req, res, next);
 
             if (!token)
-                if (!options.guest)
+                if (!options.allow_guests)
                     return next(new MissingTokenError("A valid access token must be provided for authentication."));
                 else return next();
         } 
 
-        if (!options.retrieveJWT) {
+        if (!options.retrieveJwt) {
             const header: string = req.headers.authorization?.trim();
 
             if (!header)
-                if (!options.guest)
+                if (!options.allow_guests)
                     return next(new MissingAuthorizationHeaderError("It is necessary to provide an Authorization header containing the access token."));
                 else return next();
 
@@ -72,13 +73,13 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
             if (error)
                 return next(error);
 
-            if (options.required)
-                for (const key of Object.keys(options.required)) {
+            if (options.required_claims)
+                for (const key of Object.keys(options.required_claims)) {
                     if (user[key]) 
-                        if (options.required[key].includes(user[key]))
+                        if (options.required_claims[key].includes(user[key]))
                             continue;
 
-                    return next(new PropertyNotAllowedError(`Claim <${key}> only accepts <${options.required[key]}> values. <${user[key]}> is not acceptable.`));
+                    return next(new PropertyNotAllowedError(`Claim <${key}> only accepts <${options.required_claims[key]}> values. <${user[key]}> is not acceptable.`));
                 }
 
             if (options.isRevoked)
