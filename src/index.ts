@@ -6,7 +6,8 @@ import {
 import {
     MissingAuthorizationHeaderError,
     InvalidAuthorizationHeaderError,
-    PropertyNotAllowedError
+    PropertyNotAllowedError,
+    MissingTokenError
 } from "./utilities/errors"
 
 import * as jwt from "jsonwebtoken";
@@ -22,7 +23,7 @@ export interface IOptions {
 
     validation?: (payload: jwt.JwtPayload) => boolean,
     
-    retrieveJWT?: (req: Request, res: Response, next: NextFunction) => string
+    retrieveJWT?: (req?: Request, res?: Response, next?: NextFunction) => string | null
 }
 
 export default function(options?: IOptions): (req: Request, res: Response, next: NextFunction) => void {
@@ -37,7 +38,16 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
         else throw new Error("Property `algorithm` must be set either in IOptions parameter or in process.env.");
 
     return (req: Request, res: Response, next: NextFunction): void => {
-        let token: string;
+        let token: string | null;
+
+        if (options.retrieveJWT) {
+            token = options.retrieveJWT(req, res, next);
+
+            if (!token)
+                if (!options.guest)
+                    return next(new MissingTokenError("A valid access token must be provided for authentication."));
+                else return next();
+        } 
 
         if (!options.retrieveJWT) {
             const header: string = req.headers.authorization?.trim();
@@ -52,7 +62,7 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
             if (!pattern.test(header))
                 return next(new InvalidAuthorizationHeaderError("The content of the Authorization header does not match the format: Bearer [JWT]."));
 
-            token = header.split(" ")[1];
+            token = header.split(" ").pop();
         }
 
         jwt.verify(token, options.secret, { algorithms: [options.algorithm] }, (error: jwt.VerifyErrors, user: jwt.JwtPayload): void => {

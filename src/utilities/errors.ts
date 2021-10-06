@@ -21,3 +21,11 @@ export class PropertyNotAllowedError extends Error {
         super(message);
     }
 }
+
+export class MissingTokenError extends Error {
+    public name = "MissingTokenError";
+
+    constructor(message: string) {
+        super(message);
+    }
+}
