@@ -7,7 +7,8 @@ import {
     MissingAuthorizationHeaderError,
     InvalidAuthorizationHeaderError,
     PropertyNotAllowedError,
-    MissingTokenError
+    MissingTokenError,
+    RevokedTokenError
 } from "./utilities/errors"
 
 import * as jwt from "jsonwebtoken";
@@ -22,6 +23,8 @@ export interface IOptions {
     required?: {
         [key: string]: string[]
     },
+
+    isRevoked?: (payload: jwt.JwtPayload) => boolean,
     
     retrieveJWT?: (req?: Request, res?: Response, next?: NextFunction) => string | null
 }
@@ -77,6 +80,10 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
 
                     return next(new PropertyNotAllowedError(`Claim <${key}> only accepts <${options.required[key]}> values. <${user[key]}> is not acceptable.`));
                 }
+
+            if (options.isRevoked)
+                if(options.isRevoked(user))
+                    return next(new RevokedTokenError("The token used has been revoked, it is no longer valid for authentication."));
                     
             req.user = user;
 

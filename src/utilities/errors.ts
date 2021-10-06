@@ -29,3 +29,11 @@ export class MissingTokenError extends Error {
         super(message);
     }
 }
+
+export class RevokedTokenError extends Error {
+    public name = "RevokedTokenError";
+
+    constructor(message: string) {
+        super(message);
+    }
+}
