@@ -171,11 +171,11 @@ describe("express-jwt-middleware should", function() {
 
     describe("throw an Error if", function() {
         it("IOptions.secret is not set and process.env.EXPRESS_JWT_MIDDLEWARE_SECRET is null", function() {
-            expect(() => middleware({ algorithm: "none" })).toThrowError("Property `secret` must be set either in IOptions parameter or in process.env.");
+            expect(() => middleware({ secret: null, algorithm: "none" })).toThrowError("Property `secret` must be set either in IOptions parameter or in process.env.");
         });
 
         it("IOptions.algorithm is not set and process.env.EXPRESS_JWT_MIDDLEWARE_ALGORITHM is null", function() {
-            expect(() => middleware({ secret: new String() as string })).toThrowError("Property `algorithm` must be set either in IOptions parameter or in process.env.");
+            expect(() => middleware({ secret: new String() as string, algorithm: null })).toThrowError("Property `algorithm` must be set either in IOptions parameter or in process.env.");
         });
     });
 });

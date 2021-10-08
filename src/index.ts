@@ -30,7 +30,7 @@ export interface IOptions {
     retrieveJwt?: (req?: Request, res?: Response, next?: NextFunction) => string | null
 }
 
-export default function(options?: IOptions): (req: Request, res: Response, next: NextFunction) => void {
+export default function(options: IOptions): (req: Request, res: Response, next: NextFunction) => void {
     if (options.secret == undefined)
         if (process.env.EXPRESS_JWT_MIDDLEWARE_SECRET)
             options.secret = (process.env.EXPRESS_JWT_MIDDLEWARE_SECRET as jwt.Secret);
