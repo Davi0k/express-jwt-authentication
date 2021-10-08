@@ -31,13 +31,13 @@ export interface IOptions {
 }
 
 export default function(options?: IOptions): (req: Request, res: Response, next: NextFunction) => void {
-    if (!options.secret)
+    if (options.secret == undefined)
         if (process.env.EXPRESS_JWT_MIDDLEWARE_SECRET)
             options.secret = (process.env.EXPRESS_JWT_MIDDLEWARE_SECRET as jwt.Secret);
         else throw new Error("Property `secret` must be set either in IOptions parameter or in process.env.");
 
-    if (!options.algorithm)
-        if (process.env.EXPRESS_JWT_MIDDLEWARE_SECRET)
+    if (options.algorithm == undefined)
+        if (process.env.EXPRESS_JWT_MIDDLEWARE_ALGORITHM)
             options.algorithm = (process.env.EXPRESS_JWT_MIDDLEWARE_ALGORITHM as jwt.Algorithm);
         else throw new Error("Property `algorithm` must be set either in IOptions parameter or in process.env.");
 
