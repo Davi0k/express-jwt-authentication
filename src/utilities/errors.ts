@@ -14,8 +14,8 @@ export class InvalidAuthorizationHeaderError extends Error {
     }
 }
 
-export class PropertyNotAllowedError extends Error {
-    public name = "PropertyNotAllowedError";
+export class ClaimNotAllowedError extends Error {
+    public name = "ClaimNotAllowedError";
 
     constructor(message: string) {
         super(message);

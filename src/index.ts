@@ -6,7 +6,7 @@ import {
 import {
     MissingAuthorizationHeaderError,
     InvalidAuthorizationHeaderError,
-    PropertyNotAllowedError,
+    ClaimNotAllowedError,
     MissingTokenError,
     RevokedTokenError
 } from "./utilities/errors"
@@ -79,7 +79,7 @@ export default function(options?: IOptions): (req: Request, res: Response, next:
                         if (options.required_claims[key].includes(user[key]))
                             continue;
 
-                    return next(new PropertyNotAllowedError(`Claim <${key}> only accepts <${options.required_claims[key]}> values. <${user[key]}> is not acceptable.`));
+                    return next(new ClaimNotAllowedError(`Claim <${key}> only accepts <${options.required_claims[key]}> values. <${user[key]}> is not acceptable.`));
                 }
 
             if (options.isRevoked)
