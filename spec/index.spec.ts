@@ -24,6 +24,8 @@ import {
 import * as fs from "fs"
 
 describe("express-jwt-middleware should", function() {
+    const EMPTY: string = "";
+
     describe("be able to verify a JWT encrypted with", function() {
         const req: Request = new Object() as Request, res: Response = new Object() as Response;
 
@@ -147,59 +149,92 @@ describe("express-jwt-middleware should", function() {
         });
     });
 
-    describe("permit guest authentication when IOptions.allow_guests is set to true and no JWT is provided by the", function() {
-        const req: Request = new Object() as Request, res: Response = new Object() as Response;
+    describe("allow the user to set", function() {
+        const SUBJECT: string = "615734d766e07fcf8cb24cb9";
 
-        req.headers = new Object() as IncomingHttpHeaders;
+        describe("IOptions.retrieveJwt", function() {
+            const token: string = jwt.sign(new Object(), EMPTY, { algorithm: "none", subject: SUBJECT });
 
-        it("authorization header", function() {
-            const options: IOptions = {
-                secret: new String() as jwt.Secret, 
-                algorithm: "none",
-                allow_guests: true,
-                retrieveJwt: undefined
-            };
+            const req: Request = new Object() as Request, res: Response = new Object() as Response;
 
-            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+            it("to manually return a valid JWT instead of using the authorization header", function() {
+                const options: IOptions = {
+                    secret: EMPTY, 
+                    algorithm: "none",
+                    retrieveJwt: (req: Request, res: Response, next: NextFunction): string | null => token
+                };
+        
+                middleware(options)(req, res, (error?: any) => expect(req.user.sub).toBe(SUBJECT));
+            });
+
+            it("using next() to throw an instance of MissingTokenError when set but returning null", function() {
+                const options: IOptions = {
+                    secret: EMPTY, 
+                    algorithm: "none",
+                    retrieveJwt: (req: Request, res: Response, next: NextFunction): string | null => null
+                };
+        
+                middleware(options)(req, res, (error?: any) => expect(error).toBeInstanceOf(MissingTokenError));
+            });
         });
 
-        it("IOptions.retrieveJwt method", function() {
-            const options: IOptions = {
-                secret: new String() as jwt.Secret, 
-                algorithm: "none",
-                allow_guests: true,
-                retrieveJwt: (req: Request, res: Response, next: NextFunction): string | null => null
-            };
+        describe("IOptions.isRevoked", function() {
+            const token: string = jwt.sign(new Object(), EMPTY, { algorithm: "none", subject: SUBJECT });
 
-            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+            const req: Request = new Object() as Request, res: Response = new Object() as Response;
+
+            req.headers = new Object() as IncomingHttpHeaders; req.headers["authorization"] = `Bearer ${token}`;
+
+            it("to check if the JWT has been revoked previously", function() {
+                const options: IOptions = {
+                    secret: EMPTY, 
+                    algorithm: "none",
+                    isRevoked: (payload: jwt.JwtPayload): boolean => false
+                };
+        
+                middleware(options)(req, res, (error?: any) => expect(req.user.sub).toBe(SUBJECT));
+            });
+
+            it("using next() to throw an instance of RevokedTokenError when set and returning true", function() {
+                const options: IOptions = {
+                    secret: EMPTY, 
+                    algorithm: "none",
+                    isRevoked: (payload: jwt.JwtPayload): boolean => true
+                };
+
+                middleware(options)(req, res, (error?: any) => expect(error).toBeInstanceOf(RevokedTokenError));
+            });
         });
     });
 
-    describe("allow the user to set", function() {
-        it("IOptions.retrieveJwt to manually return a valid JWT instead of using the authorization header", function() {
+    describe("permit the user to set IOptions.required_claims", function() {
+        it("to make the JWT valid only if one or more specific claims and respective acceptable values are signed in the token", function() {
 
         });
 
-        it("IOptions.isRevoked to check if the JWT has been revoked previously", function() {
-
-        });
-
-        it("IOptions.required_claims to make the JWT valid only if one or more specific claims and respective acceptable values are signed in the token", function() {
+        it("using next() to throw an instance of ClaimNotAllowedError when set and one or more claims are not acceptable", function() {
 
         });
     });
 
     describe("use next() to throw an instance of", function() {
-        it("MissingTokenError when IOptions.retrieveJwt is implemented but returns null", function() {    
+        const options: IOptions = {
+            secret: EMPTY, 
+            algorithm: "none"
+        };
 
+        const req: Request = new Object() as Request, res: Response = new Object() as Response;
+
+        it("MissingAuthorizationHeaderError when the authorization header is missing", function() {
+            req.headers = new Object() as IncomingHttpHeaders; req.headers["authorization"] = null;
+
+            middleware(options)(req, res, (error?: any) => expect(error).toBeInstanceOf(MissingAuthorizationHeaderError));
         });
 
-        it("RevokedTokenError when IOptions.isRevoked is implemented and returns true", function() {    
+        it("InvalidAuthorizationHeaderError when the authorization header is invalid", function() {
+            req.headers = new Object() as IncomingHttpHeaders; req.headers["authorization"] = "Invalid Authorization Header";
 
-        });
-
-        it("ClaimNotAllowedError when IOptions.required_claims is set and one or more claims' values are not acceptable", function() {    
-
+            middleware(options)(req, res, (error?: any) => expect(error).toBeInstanceOf(InvalidAuthorizationHeaderError));
         });
     });
 
@@ -209,7 +244,7 @@ describe("express-jwt-middleware should", function() {
         });
 
         it("IOptions.algorithm is not set and process.env.EXPRESS_JWT_MIDDLEWARE_ALGORITHM is null", function() {
-            expect(() => middleware({ secret: new String() as string, algorithm: null })).toThrowError("Property `algorithm` must be set either in IOptions parameter or in process.env.");
+            expect(() => middleware({ secret: EMPTY, algorithm: null })).toThrowError("Property `algorithm` must be set either in IOptions parameter or in process.env.");
         });
     });
 });
