@@ -147,15 +147,49 @@ describe("express-jwt-middleware should", function() {
         });
     });
 
+    describe("permit guest authentication when IOptions.allow_guests is set to true and no JWT is provided by the", function() {
+        const req: Request = new Object() as Request, res: Response = new Object() as Response;
+
+        req.headers = new Object() as IncomingHttpHeaders;
+
+        it("authorization header", function() {
+            const options: IOptions = {
+                secret: new String() as jwt.Secret, 
+                algorithm: "none",
+                allow_guests: true,
+                retrieveJwt: undefined
+            };
+
+            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+        });
+
+        it("IOptions.retrieveJwt method", function() {
+            const options: IOptions = {
+                secret: new String() as jwt.Secret, 
+                algorithm: "none",
+                allow_guests: true,
+                retrieveJwt: (req: Request, res: Response, next: NextFunction): string | null => null
+            };
+
+            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+        });
+    });
+
+    describe("allow the user to set", function() {
+        it("IOptions.retrieveJwt to manually return a valid JWT instead of using the authorization header", function() {
+
+        });
+
+        it("IOptions.isRevoked to check if the JWT has been revoked previously", function() {
+
+        });
+
+        it("IOptions.required_claims to make the JWT valid only if one or more specific claims and respective acceptable values are signed in the token", function() {
+
+        });
+    });
+
     describe("use next() to throw an instance of", function() {
-        it("MissingAuthorizationHeaderError when the authorization header is missing", function() {
-
-        });
-        
-        it("InvalidAuthorizationHeaderError when the authorization header is invalid", function() {
-
-        });
-
         it("MissingTokenError when IOptions.retrieveJwt is implemented but returns null", function() {    
 
         });
@@ -164,7 +198,7 @@ describe("express-jwt-middleware should", function() {
 
         });
 
-        it("ClaimNotAllowedError when IOptions.required_claims is set and one or more claims' values are invalid", function() {    
+        it("ClaimNotAllowedError when IOptions.required_claims is set and one or more claims' values are not acceptable", function() {    
 
         });
     });
