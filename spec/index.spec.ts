@@ -210,7 +210,7 @@ describe("express-jwt-middleware should", function() {
 
         const payload: jwt.JwtPayload = {
             "role": [ "moderator", "administrator" ][Math.floor(Math.random() * 2)],
-            "issuer": "http://localhost:3000"
+            "iss": "http://localhost:3000"
         };
 
         const token: string = jwt.sign(payload, EMPTY, { algorithm: "none", subject: SUBJECT });
@@ -225,7 +225,7 @@ describe("express-jwt-middleware should", function() {
                 algorithm: "none",
                 required_claims: { 
                     "role": [ "moderator", "administrator" ],
-                    "issuer": [ "http://localhost:3000" ]
+                    "iss": [ "http://localhost:3000" ]
                 }
             };
     
@@ -238,7 +238,7 @@ describe("express-jwt-middleware should", function() {
                 algorithm: "none",
                 required_claims: { 
                     "role": [ "moderator", "administrator" ],
-                    "issuer": [ "http://localhost:5000" ]
+                    "iss": [ "http://localhost:5000" ]
                 }
             };
     
