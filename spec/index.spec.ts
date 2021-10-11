@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import middleware, { IOptions } from "../src"
 
 import {
@@ -10,8 +8,6 @@ import {
     RevokedTokenError
 } from "../src/utilities/errors"
 
-import * as jwt from "jsonwebtoken"
-
 import { 
     Request, Response,
     NextFunction 
@@ -21,15 +17,17 @@ import {
     IncomingHttpHeaders 
 } from "http"
 
+import * as jwt from "jsonwebtoken"
+
 import * as fs from "fs"
 
 describe("express-jwt-middleware should", function() {
-    const EMPTY: string = "";
+    const EMPTY = "";
 
     describe("be able to verify a JWT encrypted with", function() {
         const req: Request = new Object() as Request, res: Response = new Object() as Response;
 
-        const SUBJECT: string = "615734d766e07fcf8cb24cb9";
+        const SUBJECT = "615734d766e07fcf8cb24cb9";
 
         describe("HMAC encryption using", function() {
             const options: IOptions = {
@@ -150,7 +148,7 @@ describe("express-jwt-middleware should", function() {
     });
 
     describe("allow the user to set", function() {
-        const SUBJECT: string = "61642b0caa086e7f7f78a0d3";
+        const SUBJECT = "61642b0caa086e7f7f78a0d3";
 
         describe("IOptions.retrieveJwt", function() {
             const token: string = jwt.sign(new Object(), EMPTY, { algorithm: "none", subject: SUBJECT });
@@ -208,7 +206,7 @@ describe("express-jwt-middleware should", function() {
     });
 
     describe("permit the user to set IOptions.required_claims", function() {
-        const SUBJECT: string = "61642af784fd8a12cd057af4";
+        const SUBJECT = "61642af784fd8a12cd057af4";
 
         const payload: jwt.JwtPayload = {
             "role": [ "moderator", "administrator" ][Math.floor(Math.random() * 2)],
