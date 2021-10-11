@@ -1,5 +1,5 @@
 export class MissingAuthorizationHeaderError extends Error {
-    public name = "MissingAuthorizationHeaderError";
+    public readonly name = "MissingAuthorizationHeaderError";
 
     constructor(message: string) {
         super(message);
@@ -7,7 +7,7 @@ export class MissingAuthorizationHeaderError extends Error {
 }
 
 export class InvalidAuthorizationHeaderError extends Error {
-    public name = "InvalidAuthorizationHeaderError";
+    public readonly name = "InvalidAuthorizationHeaderError";
 
     constructor(message: string) {
         super(message);
@@ -15,7 +15,7 @@ export class InvalidAuthorizationHeaderError extends Error {
 }
 
 export class ClaimNotAllowedError extends Error {
-    public name = "ClaimNotAllowedError";
+    public readonly name = "ClaimNotAllowedError";
 
     constructor(message: string) {
         super(message);
@@ -23,7 +23,7 @@ export class ClaimNotAllowedError extends Error {
 }
 
 export class MissingTokenError extends Error {
-    public name = "MissingTokenError";
+    public readonly name = "MissingTokenError";
 
     constructor(message: string) {
         super(message);
@@ -31,7 +31,7 @@ export class MissingTokenError extends Error {
 }
 
 export class RevokedTokenError extends Error {
-    public name = "RevokedTokenError";
+    public readonly name = "RevokedTokenError";
 
     constructor(message: string) {
         super(message);
