@@ -7,7 +7,6 @@
   "scripts": {
     "prebuild": "npx eslint . --fix --ext .ts",
     "build": "npx tsc --build",
-    "docs": "npx typedoc --out docs --exclude src/index.ts src",
     "test": "npx ts-node node_modules/jasmine/bin/jasmine --reporter=jasmine-console-reporter --config=jasmine.json"
   },
   "repository": {
@@ -38,7 +37,6 @@
     "jasmine": "^3.9.0",
     "jasmine-console-reporter": "^3.1.0",
     "ts-node": "^10.2.1",
-    "typedoc": "^0.22.5",
     "typescript": "^4.4.3"
   },
   "dependencies": {
