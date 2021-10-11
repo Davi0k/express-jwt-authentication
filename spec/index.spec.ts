@@ -150,7 +150,7 @@ describe("express-jwt-middleware should", function() {
     });
 
     describe("allow the user to set", function() {
-        const SUBJECT: string = "615734d766e07fcf8cb24cb9";
+        const SUBJECT: string = "61642b0caa086e7f7f78a0d3";
 
         describe("IOptions.retrieveJwt", function() {
             const token: string = jwt.sign(new Object(), EMPTY, { algorithm: "none", subject: SUBJECT });
@@ -208,12 +208,43 @@ describe("express-jwt-middleware should", function() {
     });
 
     describe("permit the user to set IOptions.required_claims", function() {
-        it("to make the JWT valid only if one or more specific claims and respective acceptable values are signed in the token", function() {
+        const SUBJECT: string = "61642af784fd8a12cd057af4";
 
+        const payload: jwt.JwtPayload = {
+            "role": [ "moderator", "administrator" ][Math.floor(Math.random() * 2)],
+            "issuer": "http://localhost:3000"
+        };
+
+        const token: string = jwt.sign(payload, EMPTY, { algorithm: "none", subject: SUBJECT });
+
+        const req: Request = new Object() as Request, res: Response = new Object() as Response;
+
+        req.headers = new Object() as IncomingHttpHeaders; req.headers["authorization"] = `Bearer ${token}`;
+
+        it("to make the JWT valid only if one or more specific claims and respective acceptable values are signed in the token", function() {
+            const options: IOptions = {
+                secret: EMPTY, 
+                algorithm: "none",
+                required_claims: { 
+                    "role": [ "moderator", "administrator" ],
+                    "issuer": [ "http://localhost:3000" ]
+                }
+            };
+    
+            middleware(options)(req, res, (error?: any) => expect(req.user.sub).toBe(SUBJECT));
         });
 
         it("using next() to throw an instance of ClaimNotAllowedError when set and one or more claims are not acceptable", function() {
-
+            const options: IOptions = {
+                secret: EMPTY, 
+                algorithm: "none",
+                required_claims: { 
+                    "role": [ "moderator", "administrator" ],
+                    "issuer": [ "http://localhost:5000" ]
+                }
+            };
+    
+            middleware(options)(req, res, (error?: any) => expect(error).toBeInstanceOf(ClaimNotAllowedError));
         });
     });
 
