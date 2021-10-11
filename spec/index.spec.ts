@@ -248,6 +248,34 @@ describe("express-jwt-middleware should", function() {
         });
     });
 
+    describe("permit guest authentication when IOptions.allow_guests is set to true and no JWT is provided by the", function() {
+        const req: Request = new Object() as Request, res: Response = new Object() as Response;
+    
+        req.headers = new Object() as IncomingHttpHeaders;
+    
+        it("authorization header", function() {
+            const options: IOptions = {
+                secret: EMPTY, 
+                algorithm: "none",
+                allow_guests: true,
+                retrieveJwt: undefined
+            };
+    
+            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+        });
+    
+        it("IOptions.retrieveJwt method", function() {
+            const options: IOptions = {
+                secret: EMPTY, 
+                algorithm: "none",
+                allow_guests: true,
+                retrieveJwt: (req: Request, res: Response, next: NextFunction): string | null => null
+            };
+    
+            middleware(options)(req, res, (error?: any) => expect(error == undefined && req.user == undefined).toBeTrue());
+        });
+    });
+
     describe("use next() to throw an instance of", function() {
         const options: IOptions = {
             secret: EMPTY, 
