@@ -18,7 +18,7 @@ This module basically consists of a single middleware function exported from the
 const expressJwtMiddleware = require("express-jwt-middleware");
 ```
 
-or:
+otherwise
 
 ```typescript
 import expressJwtMiddleware from "express-jwt-middleware";
