@@ -21,7 +21,7 @@ import * as jwt from "jsonwebtoken"
 
 import * as fs from "fs"
 
-describe("express-jwt-middleware should", function() {
+describe("express-jwt-authentication should", function() {
     const EMPTY = "";
 
     describe("be able to verify a JWT encrypted with", function() {
@@ -296,11 +296,11 @@ describe("express-jwt-middleware should", function() {
     });
 
     describe("throw an Error if", function() {
-        it("IOptions.secret is not set and process.env.EXPRESS_JWT_MIDDLEWARE_SECRET is null", function() {
+        it("IOptions.secret is not set and process.env.EXPRESS_JWT_AUTHENTICATION_SECRET is null", function() {
             expect(() => middleware({ secret: null, algorithm: "none" })).toThrowError("Property `secret` must be set either in IOptions parameter or in process.env.");
         });
 
-        it("IOptions.algorithm is not set and process.env.EXPRESS_JWT_MIDDLEWARE_ALGORITHM is null", function() {
+        it("IOptions.algorithm is not set and process.env.EXPRESS_JWT_AUTHENTICATION_ALGORITHM is null", function() {
             expect(() => middleware({ secret: EMPTY, algorithm: null })).toThrowError("Property `algorithm` must be set either in IOptions parameter or in process.env.");
         });
     });

@@ -1,20 +1,20 @@
-# express-jwt-middleware
+# express-jwt-authentication
 
-`express-jwt-middleware` is a very simple and lightweight library written in **TypeScript** that provides a ready-to-use middleware to quickly and securely manage authentication using **JWT** ([Json Web Token](https://jwt.io/)) on any [Express](https://expressjs.com/it/) application. 
+`express-jwt-authentication` is a very simple and lightweight library written in **TypeScript** that provides a ready-to-use middleware to quickly and securely manage authentication using **JWT** ([Json Web Token](https://jwt.io/)) on any [Express](https://expressjs.com/it/) application. 
 
 This module depends on [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken), which is used for token verification and payload extraction. 
 
 ## Installation
 
 ```shell
-npm install express-jwt-middleware
+npm install express-jwt-authentication
 ```
 ## Basic usage
 
 A very simple and common use of middleware:
 
 ```javascript
-const expressJwtMiddleware = require("express-jwt-middleware");
+const expressJwtAuthentication = require("express-jwt-authentication");
 
 const options = { 
     secret: "WN4G0PXBR0F7MSMPQ2JQJ22S3GRSD69A963HG6RBUFFF5YSLYB8ZK365H7MXGI8E", 
@@ -23,14 +23,14 @@ const options = {
 
 app.get(
     "/api/protected",
-    expressJwtMiddleware(options),
+    expressJwtAuthentication(options),
     (req, res, next) => res.json(req.user)
 );
 ```
 
 In this example, to access the `/api/protected` endpoint, the user will first need to authenticate through the middleware using a valid **JWT**. 
 
-`expressJwtMiddleware` requires an object to be passed as a parameter containing the options to use. In this specific case, only the not optional settings are provided, which respectively are the `secret` and the `algorithm` used for the token encryption.
+`expressJwtAuthentication` requires an object to be passed as a parameter containing the options to use. In this specific case, only the not optional settings are provided, which respectively are the `secret` and the `algorithm` used for the token encryption.
 
 By default, the middleware will try to retrieve the **JWT** from the **HTTP** request's **Authorization** header:
 
@@ -51,7 +51,7 @@ If the **Authorization** header is not provided or its content does not comply w
 It may be necessary to grant access to a secure endpoint even if no **JWT** is used. In this way the middleware will continue to identify authenticated users but still provide access to guests:
 
 ```javascript
-expressJwtMiddleware({ 
+expressJwtAuthentication({ 
     [...]
     allow_guests: true 
 });
@@ -64,7 +64,7 @@ In the case of a guest authentication, the middleware will not change the value 
 The middleware allows restrictions on claims and their respective acceptable values to be set. These requirements must be met for authentication with **JWT** to be successful:
 
 ```javascript
-expressJwtMiddleware({ 
+expressJwtAuthentication({ 
     [...]
     required_claims: {
         "role": [ "moderator", "administrator" ],
@@ -83,7 +83,7 @@ Otherwise, the middleware will throw a `ClaimNotAllowedError` using `next()`.
 By default, the **JWT** is implicitly retrieved from the **Authorization** header. It is possible, however, to define a `retrieveJwt()` method that manually and explicitly returns the token to use for the authentication:
 
 ```javascript
-expressJwtMiddleware({ 
+expressJwtAuthentication({ 
     [...]
     retrieveJwt: (req, res, next) => {
         if(req.query)
@@ -105,7 +105,7 @@ If no token is provided, the middleware will throw an `InvalidTokenError` using 
 It is possible to perform a manual check on the tokens accepted by the middleware to verify that they have not been previously revoked. To do this, simply define the appropriate `isRevoked()` method within the options:
 
 ```javascript
-expressJwtMiddleware({ 
+expressJwtAuthentication({ 
     [...]
     isRevoked: (payload) => {
         const 
@@ -125,17 +125,17 @@ If the used token is revoked, the middleware will throw a `RevokedTokenError` us
 
 ## Environment variables
 
-It is possible to globally define the `secret` and the `algorithm` to use to decode the tokens. This way, they won't have to be specified every time the middleware is invoked. To do this, just assign the desired values to the environment variables `EXPRESS_JWT_MIDDLEWARE_SECRET` and `EXPRESS_JWT_MIDDLEWARE_ALGORITHM`:
+It is possible to globally define the `secret` and the `algorithm` to use to decode the tokens. This way, they won't have to be specified every time the middleware is invoked. To do this, just assign the desired values to the environment variables `EXPRESS_JWT_AUTHENTICATION_SECRET` and `EXPRESS_JWT_AUTHENTICATION_ALGORITHM`:
 
 ```shell
-EXPRESS_JWT_MIDDLEWARE_SECRET=[SECRET] EXPRESS_JWT_MIDDLEWARE_ALGORITHM=[ALGORITHM] node app.js
+EXPRESS_JWT_AUTHENTICATION_SECRET=[SECRET] EXPRESS_JWT_AUTHENTICATION_ALGORITHM=[ALGORITHM] node app.js
 ```
 
 If the application includes [dotenv](https://github.com/motdotla/dotenv) or a similar library, the environment variables can also be set through a `.env` file:
 
 ```
-EXPRESS_JWT_MIDDLEWARE_SECRET=WN4G0PXBR0F7MSMPQ2JQJ22S3GRSD69A963HG6RBUFFF5YSLYB8ZK365H7MXGI8E
-EXPRESS_JWT_MIDDLEWARE_ALGORITHM=HS256
+EXPRESS_JWT_AUTHENTICATION_SECRET=WN4G0PXBR0F7MSMPQ2JQJ22S3GRSD69A963HG6RBUFFF5YSLYB8ZK365H7MXGI8E
+EXPRESS_JWT_AUTHENTICATION_ALGORITHM=HS256
 ```
 
 In this way, the middleware can be used like this:
@@ -143,7 +143,7 @@ In this way, the middleware can be used like this:
 ```javascript
 app.get(
     "/api/protected",
-    expressJwtMiddleware({}),
+    expressJwtAuthentication({}),
     (req, res, next) => res.json(req.user)
 );
 ```
