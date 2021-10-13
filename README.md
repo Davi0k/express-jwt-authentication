@@ -6,45 +6,16 @@ This module depends on [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken
 
 ## Installation
 
-`express-jwt-middleware` can be installed using **NPM**:
-
 ```shell
 npm install express-jwt-middleware
 ```
-
-This module basically consists of a single middleware function exported from the library by default. It can be imported with:
-
-```javascript
-const expressJwtMiddleware = require("express-jwt-middleware");
-```
-
-## Building from source code
-
-Install all required `dependencies` and `devDependencies`:
-
-```shell
-npm install
-```
-
-Then, build the project:
-
-```shell
-npm run build
-```
-
-## Testing
-
-The unit tests provided are written in [Jasmine](https://jasmine.github.io/). They can be performed using:
-
-```shell
-npm test
-```
-
 ## Basic usage
 
 A very simple and common use of middleware:
 
 ```javascript
+const expressJwtMiddleware = require("express-jwt-middleware");
+
 const options = { 
     secret: "WN4G0PXBR0F7MSMPQ2JQJ22S3GRSD69A963HG6RBUFFF5YSLYB8ZK365H7MXGI8E", 
     algorithm: "HS256" 
@@ -59,7 +30,7 @@ app.get(
 
 In this example, to access the `/api/protected` endpoint, the user will first need to authenticate through the middleware using a valid **JWT**. 
 
-`expressJwtMiddleware` requires an object to be passed as a parameter containing the options to use. In this specific case, only the not optional settings are provided, which respectively are the secret and the algorithm used for the token encryption.
+`expressJwtMiddleware` requires an object to be passed as a parameter containing the options to use. In this specific case, only the not optional settings are provided, which respectively are the `secret` and the `algorithm` used for the token encryption.
 
 By default, the middleware will try to retrieve the **JWT** from the **HTTP** request's **Authorization** header:
 
@@ -77,7 +48,7 @@ If the **Authorization** header is not provided or its content does not comply w
 
 ## Allow guest authentication
 
-It may be necessary to grant access to a secure endpoint even if no **JWT** is used. In this way you can continue to identify authenticated users but still provide use access to guests:
+It may be necessary to grant access to a secure endpoint even if no **JWT** is used. In this way the middleware will continue to identify authenticated users but still provide access to guests:
 
 ```javascript
 expressJwtMiddleware({ 
@@ -109,7 +80,7 @@ Otherwise, the middleware will throw a `ClaimNotAllowedError` using `next()`.
 
 ## Custom token retrieval
 
-By default, the **JWT** is implicitly retrieved from the **Authorization** header. It is possible, however, to define a `retrieveJwt` method that manually and explicitly returns the token to use for the authentication:
+By default, the **JWT** is implicitly retrieved from the **Authorization** header. It is possible, however, to define a `retrieveJwt()` method that manually and explicitly returns the token to use for the authentication:
 
 ```javascript
 expressJwtMiddleware({ 
@@ -123,7 +94,7 @@ expressJwtMiddleware({
 });
 ```
 
-The method behaves like any other **Express** middleware. Therefore, to manage token retrival, you can also use the typical `req`, `res` and `next` parameters provided by the framework.
+The method behaves like any other **Express** middleware. Therefore, the typical `req`, `res` and `next` parameters provided by the framework can be used to handle the token retrival.
 
 It must return a `string` containing the **JWT** to use, or `null` if none were provided within the **HTTP** request.
 
@@ -131,7 +102,7 @@ If no token is provided, the middleware will throw an `InvalidTokenError` using 
 
 ## Handle revoked tokens
 
-It is possible to perform a manual check on the tokens accepted by the middleware to verify that they have not been previously revoked. To do this, simply define the appropriate `isRevoked` method within the options:
+It is possible to perform a manual check on the tokens accepted by the middleware to verify that they have not been previously revoked. To do this, simply define the appropriate `isRevoked()` method within the options:
 
 ```javascript
 expressJwtMiddleware({ 
@@ -151,6 +122,31 @@ expressJwtMiddleware({
 The payload of the **JWT** used for authentication is passed as a parameter to the method, which must return a boolean value corresponding to the result of the check. `true` if the token has been revoked, `false` if the token is still valid.
 
 If the used token is revoked, the middleware will throw a `RevokedTokenError` using `next()`.
+
+## Environment variables
+
+It is possible to globally define the `secret` and the `algorithm` to use to decode the tokens. This way, they won't have to be specified every time the middleware is invoked. To do this, just assign the desired values to the environment variables `EXPRESS_JWT_MIDDLEWARE_SECRET` and `EXPRESS_JWT_MIDDLEWARE_ALGORITHM`:
+
+```shell
+EXPRESS_JWT_MIDDLEWARE_SECRET=[SECRET] EXPRESS_JWT_MIDDLEWARE_ALGORITHM=[ALGORITHM] node app.js
+```
+
+If the application includes [dotenv](https://github.com/motdotla/dotenv) or a similar library, the environment variables can also be set through a `.env` file:
+
+```
+EXPRESS_JWT_MIDDLEWARE_SECRET=WN4G0PXBR0F7MSMPQ2JQJ22S3GRSD69A963HG6RBUFFF5YSLYB8ZK365H7MXGI8E
+EXPRESS_JWT_MIDDLEWARE_ALGORITHM=HS256
+```
+
+In this way, the middleware can be used like this:
+
+```javascript
+app.get(
+    "/api/protected",
+    expressJwtMiddleware({}),
+    (req, res, next) => res.json(req.user)
+);
+```
 
 ## Error handling
 
@@ -181,7 +177,9 @@ Each error is passed as a parameter to `next()` to be handled later.
 
 ## Supported encryption algorithms
 
-Currently, the middleware supports most of the encryption algorithms (symmetric and asymmetric ones) supported by `jsonwebtoken` itself. Here is a list updated to the version of the library in use by the middleware containing all the available strategies:
+Currently, this module supports most of the symmetric and asymmetric encryption algorithms supported by `jsonwebtoken` itself. 
+
+Here is a list updated to the version of the library in use by the middleware containing all the available strategies:
 
 Algorithm | Digital Signature or MAC Algorithm
 ----------------|----------------------------
@@ -195,6 +193,28 @@ ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
 ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
 ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
 none | No digital signature or MAC value included
+
+## Building from source code
+
+Install all required `dependencies` and `devDependencies`:
+
+```shell
+npm install
+```
+
+Then, build the project:
+
+```shell
+npm run build
+```
+
+## Testing
+
+The unit tests provided are written in [Jasmine](https://jasmine.github.io/). They can be performed using:
+
+```shell
+npm test
+```
 
 ## License 
 
