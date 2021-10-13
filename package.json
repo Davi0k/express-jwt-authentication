@@ -1,7 +1,7 @@
 {
   "name": "express-jwt-middleware",
   "version": "1.0.0",
-  "description": "Simple and lightweight express middleware written in typescript to easily handle user authentication with JWT.",
+  "description": "Simple and lightweight Express middleware written in TypeScript to easily handle user authentication with JWT.",
   "main": "./build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
