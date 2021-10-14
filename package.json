@@ -15,9 +15,11 @@
   },
   "keywords": [
     "jwt",
+    "jsonwebtoken",
     "express",
     "middleware",
     "typescript",
+    "javascript",
     "authentication"
   ],
   "author": {

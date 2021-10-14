@@ -1,8 +1,21 @@
-# express-jwt-authentication
+# express-jwt-authentication 
 
 `express-jwt-authentication` is a very simple and lightweight library written in **TypeScript** that provides a ready-to-use middleware to quickly and securely manage authentication using **JWT** ([Json Web Token](https://jwt.io/)) on any [Express](https://expressjs.com/it/) application. 
 
 This module depends on [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken), which is used for token verification and payload extraction. 
+
+- [Installation](#installation)
+- [Basic usage](#basic-usage)
+- [Allow guest authentication](#allow-guest-authentication)
+- [Check claims before authentication](#check-claims-before-authentication)
+- [Custom token retrieval](#custom-token-retrieval)
+- [Handle revoked tokens](#handle-revoked-tokens)
+- [Environment variables](#environment-variables)
+- [Error handling](#error-handling)
+- [Supported encryption algorithms](#supported-encryption-algorithms)
+- [Building from source code](#building-from-source-code)
+- [Testing](#testing)
+- [License](#license)
 
 ## Installation
 
@@ -11,7 +24,7 @@ npm install express-jwt-authentication
 ```
 ## Basic usage
 
-A very simple and common use of middleware:
+A very simple and common use of the middleware:
 
 ```javascript
 const expressJwtAuthentication = require("express-jwt-authentication");
@@ -28,9 +41,9 @@ app.get(
 );
 ```
 
-In this example, to access the `/api/protected` endpoint, the user will first need to authenticate through the middleware using a valid **JWT**. 
+In the example above, to access the `/api/protected` endpoint, the user will first need to authenticate through the middleware using a valid **JWT**.
 
-`expressJwtAuthentication` requires an object to be passed as a parameter containing the options to use. In this specific case, only the not optional settings are provided, which respectively are the `secret` and the `algorithm` used for the token encryption.
+`expressJwtAuthentication` requires an object to be passed as a parameter containing the options to use. In this specific case, only the required properties are provided, which correspond to the `secret` and the `algorithm` used for the token encryption.
 
 By default, the middleware will try to retrieve the **JWT** from the **HTTP** request's **Authorization** header:
 
@@ -48,7 +61,7 @@ If the **Authorization** header is not provided or its content does not comply w
 
 ## Allow guest authentication
 
-It may be necessary to grant access to a secure endpoint even if no **JWT** is used. In this way the middleware will continue to identify authenticated users but still provide access to guests:
+It may be necessary to grant access to a secure endpoint even if no **JWT** is used. In this way the middleware will continue to identify authenticated users but will also provide access to guests:
 
 ```javascript
 expressJwtAuthentication({ 
@@ -61,7 +74,7 @@ In the case of a guest authentication, the middleware will not change the value 
 
 ## Check claims before authentication
 
-The middleware allows restrictions on claims and their respective acceptable values to be set. These requirements must be met for authentication with **JWT** to be successful:
+The middleware allows restrictions on claims and to their values. These requirements must be met by the token's payload for authentication with **JWT** to be successful:
 
 ```javascript
 expressJwtAuthentication({ 
@@ -98,11 +111,13 @@ The method behaves like any other **Express** middleware. Therefore, the typical
 
 It must return a `string` containing the **JWT** to use, or `null` if none were provided within the **HTTP** request.
 
-If no token is provided, the middleware will throw an `InvalidTokenError` using `next()`.
+In case the returned value is not a valid token, the middleware will throw an `InvalidTokenError` using `next()`.
 
 ## Handle revoked tokens
 
-It is possible to perform a manual check on the tokens accepted by the middleware to verify that they have not been previously revoked. To do this, simply define the appropriate `isRevoked()` method within the options:
+It is possible to perform a manual check on the tokens accepted by the middleware to verify that they have not been previously revoked. 
+
+To do this, simply define the appropriate `isRevoked()` method within the options:
 
 ```javascript
 expressJwtAuthentication({ 
